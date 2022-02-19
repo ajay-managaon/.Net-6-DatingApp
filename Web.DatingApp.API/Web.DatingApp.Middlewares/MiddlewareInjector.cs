@@ -5,17 +5,13 @@
         public static void AddMiddleWares(WebApplicationBuilder builder)
         {
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline. 
-            if (app.Environment.IsDevelopment())
+            app.UseMiddleware<ExceptionMiddleware>();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "datingapp");
-                    c.RoutePrefix = string.Empty;
-                });
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "datingapp");
+                c.RoutePrefix = string.Empty;
+            });
 
             app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://datingappng.azurewebsites.net", "http://localhost:4200", "https://datingapp-mgmt-service.azure-api.net"));
 
@@ -26,6 +22,6 @@
             app.MapControllers();
 
             app.Run();
-        } 
+        }
     }
 }

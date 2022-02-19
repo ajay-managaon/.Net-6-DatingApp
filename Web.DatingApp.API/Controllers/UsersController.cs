@@ -17,18 +17,16 @@ namespace Web.DatingApp.API.Controllers
             this.datingAppDbContext = datingAppDbContext;
         }
 
-
-        [HttpGet]
         [AllowAnonymous]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
         {
             var users = await datingAppDbContext.tbl_User.ToListAsync();
             return Ok(users);
         }
 
-
-        [HttpGet("{id}")]
         [Authorize]
+        [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers(int id)
         {
             var user = await datingAppDbContext.tbl_User.FindAsync(id);
