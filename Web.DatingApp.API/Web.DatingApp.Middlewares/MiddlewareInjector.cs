@@ -17,7 +17,7 @@
                 });
             }
 
-            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://datingappng.azurewebsites.net", "http://localhost:4200"));
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://datingappng.azurewebsites.net", "http://localhost:4200", "https://datingapp-mgmt-service.azure-api.net"));
 
             app.UseAuthentication();
 
