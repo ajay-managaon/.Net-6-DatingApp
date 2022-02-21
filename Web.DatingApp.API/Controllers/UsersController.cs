@@ -1,40 +1,58 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Web.DatingApp.API.Web.DatingApp.Database;
+using Web.DatingApp.API.Web.DatingApp.Dtos;
 using Web.DatingApp.API.Web.DatingApp.Entities;
+using Web.DatingApp.API.Web.DatingApp.Interfaces.Repositories;
 
 namespace Web.DatingApp.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
-    {
-        private readonly DatingAppDbContext datingAppDbContext;
+    { 
+        private readonly IUserRepository userRepository;
+        private readonly IMapper mapper;
 
-        public UsersController(DatingAppDbContext datingAppDbContext)
+        public UsersController(IUserRepository userRepository, IMapper mapper)
         {
-            this.datingAppDbContext = datingAppDbContext;
+            this.userRepository = userRepository;
+            this.mapper = mapper;
         }
 
-        [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
         {
-            var users = await datingAppDbContext.tbl_User.ToListAsync();
-            return Ok(users);
+            var users = await userRepository.GetUsersAsync();
+            var members = mapper.Map<IEnumerable<MemberDto>> (users);
+            return Ok(members);
         }
 
-        [Authorize]
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers(int id)
+        //[HttpGet("id")]
+        //public async Task<ActionResult<IEnumerable<MemberDto>>> GetUser(int id)
+        //{
+        //    var user = await userRepository.GetUserByIdAsync(id);
+        //    var member = mapper.Map<MemberDto> (user);
+        //    if (member != null)
+        //    {
+        //        return Ok(member);
+        //    }
+        //    return NotFound("Member with id " + id + " not found");
+        //}
+
+        [HttpGet("{name}")]
+        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUserByName(string name)
         {
-            var user = await datingAppDbContext.tbl_User.FindAsync(id);
-            if (user!= null)
+            var user = await userRepository.GetUserByNameAsync(name);
+            var member = mapper.Map<MemberDto>(user);
+            if (member != null)
             {
-                return Ok(user);
+                return Ok(member);
             }
-            return NotFound("User with id " + id + " not found");
+            return NotFound("Member with id " + name + " not found");
         }
     }
 }

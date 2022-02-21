@@ -6,6 +6,9 @@ using Web.DatingApp.API.Web.DatingApp.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using Web.DatingApp.API.Web.DatingApp.Interfaces.Repositories;
+using Web.DatingApp.API.Web.DatingApp.Implenentations.Implementations;
+using Web.DatingApp.API.Web.DatingApp.Helpers;
 
 namespace Web.DatingApp.API.Web.DatingApp.IocContainer
 {
@@ -40,6 +43,8 @@ namespace Web.DatingApp.API.Web.DatingApp.IocContainer
                     });
             });
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             builder.Services.AddDbContext<DatingAppDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatingAppConnectionString"));

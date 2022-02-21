@@ -9,6 +9,7 @@ namespace Web.DatingApp.API.Web.DatingApp.Database
         {
 
         }
-        public DbSet<AppUser> tbl_User  => Set<AppUser>();
+        public DbSet<AppUser> tbl_User { get; set; }
+        public DbSet<Photo> tbl_Photos { get; set; }
     }
 }

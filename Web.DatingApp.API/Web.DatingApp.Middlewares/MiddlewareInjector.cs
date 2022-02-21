@@ -2,9 +2,8 @@
 {
     public static class MiddlewareInjector
     {
-        public static void AddMiddleWares(WebApplicationBuilder builder)
+        public static void AddMiddleWares(WebApplicationBuilder builder, WebApplication app)
         {
-            var app = builder.Build();
             app.UseMiddleware<ExceptionMiddleware>();
             app.UseSwagger();
             app.UseSwaggerUI(c =>
