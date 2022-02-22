@@ -11,7 +11,7 @@ namespace Web.DatingApp.API.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api")]
     public class UsersController : ControllerBase
     { 
         private readonly IUserRepository userRepository;
@@ -23,7 +23,7 @@ namespace Web.DatingApp.API.Controllers
             this.mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet("users")]
         public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
         {
             var users = await userRepository.GetUsersAsync();
@@ -43,7 +43,7 @@ namespace Web.DatingApp.API.Controllers
         //    return NotFound("Member with id " + id + " not found");
         //}
 
-        [HttpGet("{name}")]
+        [HttpGet("user/{name}")]
         public async Task<ActionResult<IEnumerable<MemberDto>>> GetUserByName(string name)
         {
             var user = await userRepository.GetUserByNameAsync(name);

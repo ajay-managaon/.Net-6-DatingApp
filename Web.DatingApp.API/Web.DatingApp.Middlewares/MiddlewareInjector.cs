@@ -12,7 +12,7 @@
                 c.RoutePrefix = string.Empty;
             });
 
-            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://datingappng.azurewebsites.net", "http://localhost:4200", "https://datingapp-mgmt-service.azure-api.net"));
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
 
             app.UseAuthentication();
 
