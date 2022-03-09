@@ -46,12 +46,14 @@ namespace Web.DatingApp.API.Web.DatingApp.IocContainer
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IContainerService, ContainerService>();
+            builder.Services.AddScoped<IPhotoService, PhotoService>();
             builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             builder.Services.AddDbContext<DatingAppDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatingAppConnectionString"));
             });
             builder.Services.AddSingleton(s => new BlobServiceClient(builder.Configuration.GetConnectionString("StorageConnectionString")));
+            builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CLoudinarySettings"));
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters

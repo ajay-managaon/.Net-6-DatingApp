@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
@@ -31,28 +29,26 @@ namespace Web.DatingApp.API.Controllers
             {
                 return BadRequest("Username already exists");
             }
-            using (var hmac = new HMACSHA512())
+            using var hmac = new HMACSHA512();
+            var user = new AppUser
             {
-                var user = new AppUser
-                {
-                    UserName = registerDto.UserName,
-                    PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
-                    PasswordSalt = hmac.Key
-                };
-                datingAppDbContext.tbl_User.Add(user);
-                await datingAppDbContext.SaveChangesAsync();
-                return new UserDto
-                {
-                    Username = registerDto.UserName,
-                    Token = tokenService.CreateToken(user)
-                };
-            }
+                UserName = registerDto.UserName,
+                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
+                PasswordSalt = hmac.Key
+            };
+            datingAppDbContext.tbl_User.Add(user);
+            await datingAppDbContext.SaveChangesAsync();
+            return new UserDto
+            {
+                Username = registerDto.UserName,
+                Token = tokenService.CreateToken(user)
+            };
         }
 
         [HttpPost("account/login")]
         public async Task<ActionResult<UserDto>> Login([FromBody] LoginDto logindto)
         {
-            var user = await datingAppDbContext.tbl_User.SingleOrDefaultAsync(u => u.UserName == logindto.UserName);
+            var user = await datingAppDbContext.tbl_User.Include(p=>p.Photos).SingleOrDefaultAsync(u => u.UserName == logindto.UserName);
             if (user == null)
             {
                 return Unauthorized("Invalid User Name");
@@ -71,7 +67,8 @@ namespace Web.DatingApp.API.Controllers
             return new UserDto
             {
                 Username = user.UserName,
-                Token = tokenService.CreateToken(user)
+                Token = tokenService.CreateToken(user),
+                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
             };
         }
 

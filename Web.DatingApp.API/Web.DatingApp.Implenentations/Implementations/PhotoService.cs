@@ -1,28 +1,49 @@
 ﻿using Azure.Storage.Blobs;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.Extensions.Options;
+using Web.DatingApp.API.Web.DatingApp.Helpers;
 using Web.DatingApp.API.Web.DatingApp.Interfaces.Repositories;
 
 namespace Web.DatingApp.API.Web.DatingApp.Implenentations.Implementations
 {
     public class PhotoService : IPhotoService
     {
-        private readonly IContainerService containerService;
-        private readonly BlobServiceClient blobServiceClient;
+        private readonly Cloudinary cloudinary;
 
-        public PhotoService(IContainerService containerService, BlobServiceClient blobServiceClient)
+        public PhotoService(IOptions<CloudinarySettings> options)
         {
-            this.containerService = containerService;
-            this.blobServiceClient = blobServiceClient;
+            var acc = new Account
+            {
+                Cloud = options.Value.CloudName,
+                ApiKey = options.Value.CloudApiKey,
+                ApiSecret = options.Value.CloudApiSecret
+            };
+            cloudinary = new Cloudinary(acc);
         }
-        public BlobClient AdPhotoAsync(IFormFile file)
+        public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
         {
-            var containerClient = blobServiceClient.GetBlobContainerClient(containerService.GetContainer());
-            var clientOptions = containerClient.GetBlobClient(file.Name);
-            return clientOptions;
+            var uploadResult = new ImageUploadResult();
+            if (file.Length > 0)
+            {
+                await using var stream = file.OpenReadStream();
+                var uploadParams = new ImageUploadParams
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face")
+                };
+                uploadResult = await cloudinary.UploadAsync(uploadParams);
+            }
+            return uploadResult;
         }
-
-        public bool DeletePhoto(string publicId)
+        public async Task<DeletionResult> DeletePhotoAsync(string publicId)
         {
-            throw new NotImplementedException();
+            var deleteParams = new DeletionParams(publicId);
+            var result = await cloudinary.DestroyAsync(deleteParams);
+            return result;
         }
     }
 }
+
+
+
